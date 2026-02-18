@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关系评估表 · 双向健康检测</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(145deg, #f4f7fb 0%, #eef2f7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .card {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 42px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+            padding: 2.5rem 2rem;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1f2a3f, #2d3b55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sub {
+            color: #4a5b7a;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #8a9bbf;
+            padding-left: 1.2rem;
+            background: #e9eef6;
+            border-radius: 0 20px 20px 0;
+            line-height: 1.5;
+            width: fit-content;
+            padding: 0.7rem 1.5rem;
+        }
+        .meta-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem 2rem;
+            background: white;
+            border-radius: 36px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2.8rem;
+            box-shadow: 0 8px 18px -8px rgba(0,20,40,0.15);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            min-width: 200px;
+        }
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #3f5070;
+        }
+        .input-group input {
+            border: none;
+            background: #f0f4fe;
+            border-radius: 40px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #7c8fbf;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(105, 128, 200, 0.2);
+        }
+        .score-summary {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: #e1e8f2;
+            border-radius: 100px;
+            padding: 0.2rem 2rem 0.2rem 2.2rem;
+        }
+        .score-summary div {
+            text-align: center;
+        }
+        .score-label {
+            font-size: 0.85rem;
+            color: #2c3d5e;
+            font-weight: 500;
+        }
+        .score-number {
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #1b2b49;
+        }
+        .score-max {
+            font-size: 1rem;
+            color: #5d6f92;
+        }
+        .section {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 12px 28px -12px rgba(0,20,50,0.12);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #202f44;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2 span {
+            background: #ced9ed;
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e2c45;
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px dashed #d8e0ec;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .item-text {
+            flex: 1;
+            font-size: 1.04rem;
+            color: #1f2e45;
+            font-weight: 450;
+            line-height: 1.4;
+        }
+        .radio-group {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            background: #f2f6fc;
+            border-radius: 40px;
+            padding: 0.2rem;
+            border: 1px solid #c7d3e6;
+        }
+        .radio-group label {
+            width: 2.8rem;
+            height: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #30415e;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+        .radio-group input[type="radio"]:checked + label {
+            background: #2d405c;
+            color: white;
+            box-shadow: 0 2px 8px rgba(30,50,80,0.3);
+        }
+        .radio-group label:hover {
+            background: #ccd8ec;
+        }
+        .footnote {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #5b6f91;
+            text-align: right;
+        }
+        .result-area {
+            background: #edf2fa;
+            border-radius: 30px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2rem;
+        }
+        .gauge {
+            flex: 2;
+            min-width: 240px;
+        }
+        .gauge-bar {
+            height: 24px;
+            background: #cfdbe9;
+            border-radius: 40px;
+            overflow: hidden;
+            margin: 0.5rem 0 1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .gauge-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6688b6, #345e9b);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .verdict {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 28px;
+            padding: 1.6rem 1.8rem;
+            box-shadow: 0 6px 18px rgba(70,90,120,0.12);
+        }
+        .verdict h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #202f44;
+            margin-bottom: 0.6rem;
+        }
+        .verdict p {
+            color: #3c4e6e;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .badge {
+            display: inline-block;
+            background: #d1def0;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1f3050;
+        }
+        .advice-list {
+            margin-top: 1.2rem;
+            list-style-type: none;
+        }
+        .advice-list li {
+            padding: 0.5rem 0 0.5rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2334527a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>') left center no-repeat;
+            background-size: 1.2rem;
+        }
+        .btn-reset {
+            background: white;
+            border: 1.5px solid #9fafcb;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #293c5e;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 1rem;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .btn-reset:hover {
+            background-color: #e3ebf8;
+            border-color: #637ba3;
+        }
+        footer {
+            margin-top: 1.5rem;
+            color: #6a7b9c;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🧭 关系健康评估 · 双向镜</h1>
+    <div class="sub">填完20题 · 自动计分 · 看见真实的关系轮廓</div>
+
+    <div class="meta-panel">
+        <div class="input-group">
+            <label>👤 关系对象 (昵称/代号)</label>
+            <input type="text" id="relationName" placeholder="例: A / 好朋友 / 家人" value="A">
+        </div>
+        <div class="input-group">
+            <label>📅 评估日期</label>
+            <input type="date" id="assessDate" value="2026-02-14">
+        </div>
+        <div class="score-summary" id="liveTotalDisplay">
+            <div>
+                <div class="score-label">当前总分</div>
+                <div class="score-number" id="totalScoreDisplay">0</div>
+                <div class="score-max">/100</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 四个部分将会由JavaScript动态生成，以便管理数据和总分 -->
+    <div id="sectionsContainer"></div>
+
+    <!-- 结果解读 + 建议区 -->
+    <div class="result-area" id="resultArea">
+        <div class="gauge">
+            <div style="display: flex; justify-content: space-between; font-weight:600; color:#263b58;">
+                <span>关系健康指数</span>
+                <span id="scorePercent">0%</span>
+            </div>
+            <div class="gauge-bar">
+                <div class="gauge-fill" id="gaugeFill" style="width:0%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; color:#496288; font-size:0.9rem;">
+                <span>消耗 · 预警</span>
+                <span>均衡 · 滋养</span>
+            </div>
+        </div>
+        <div class="verdict" id="verdictBox">
+            <h3 id="verdictTitle">待评估</h3>
+            <p id="verdictDesc">完成所有题目即可获得关系健康评级与建议</p>
+            <div class="badge" id="scoreRangeLabel">0分</div>
+            <ul class="advice-list" id="adviceList">
+                <li>点击选项自动计算</li>
+            </ul>
+        </div>
+    </div>
+
+    <button class="btn-reset" id="resetBtn"><span>⟲</span> 重置所有评分为3分 (一般)</button>
+    <footer>—— 基于你的边界清单 · 为自己选择健康的关系 ——</footer>
+</div>
+
+<script>
+    (function() {
+        // ---------- 题目数据 (20项) ----------
+        const questions = [
+            // 第一部分: 情感安全 (1-5)
+            { section: 1, text: "1. 和TA在一起，我可以放松地做自己，不用假装" },
+            { section: 1, text: "2. 我不怕在TA面前暴露脆弱" },
+            { section: 1, text: "3. TA不会用我的脆弱来伤害我" },
+            { section: 1, text: "4. 和TA相处后，我通常感到轻松，而不是更累" },
+            { section: 1, text: "5. 我不用小心翼翼，担心哪句话会惹TA生气" },
+            // 第二部分: 沟通质量 (6-10)
+            { section: 2, text: "6. 有矛盾时，TA愿意沟通，而不是冷暴力" },
+            { section: 2, text: "7. TA表达不满时，是针对事情，而不是攻击我的人格" },
+            { section: 2, text: "8. 我可以表达不同意见，而不会被TA记恨" },
+            { section: 2, text: "9. 误会发生时，TA愿意听我解释" },
+            { section: 2, text: "10. 我们吵架后，能真的和好，而不是假装没事" },
+            // 第三部分: 责任对等 (11-15)
+            { section: 3, text: "11. 我需要帮助时，TA愿意伸手（哪怕只是倾听）" },
+            { section: 3, text: "12. TA会记得我帮过TA，而不是觉得理所应当" },
+            { section: 3, text: "13. TA对自己的承诺负责（借钱会还，答应的事会做）" },
+            { section: 3, text: "14. TA不会把自己的责任甩给我" },
+            { section: 3, text: "15. 我们的付出大致是双向的，不是我在单方面输血" },
+            // 第四部分: 尊重边界 (16-20)
+            { section: 4, text: "16. 我说“不”的时候，TA能尊重，不会生气或冷战" },
+            { section: 4, text: "17. TA不会用“你不帮我就是不在乎我”来绑架我" },
+            { section: 4, text: "18. TA尊重我的时间，不会随时要求我待命" },
+            { section: 4, text: "19. TA不会试图改变我的性格（如“你应该开朗一点”）" },
+            { section: 4, text: "20. TA接受我和TA不同" }
+        ];
+
+        // 分值存储
+        let scores = new Array(20).fill(3);   // 默认3分 “一般”
+        const sectionNames = ["情感安全", "沟通质量", "责任对等", "尊重边界"];
+
+        // 获取容器
+        const container = document.getElementById('sectionsContainer');
+        const totalSpan = document.getElementById('totalScoreDisplay');
+        const percentSpan = document.getElementById('scorePercent');
+        const gaugeFill = document.getElementById('gaugeFill');
+        const verdictTitle = document.getElementById('verdictTitle');
+        const verdictDesc = document.getElementById('verdictDesc');
+        const scoreRangeLabel = document.getElementById('scoreRangeLabel');
+        const adviceList = document.getElementById('adviceList');
+
+        // 渲染所有题目
+        function renderSections() {
+            let html = '';
+            for (let s = 1; s <= 4; s++) {
+                const secQuestions = questions.filter(q => q.section === s);
+                html += `<div class="section" id="section-${s}">`;
+                html += `<h2>${sectionNames[s-1]} <span>${secQuestions.length} 题</span></h2>`;
+
+                secQuestions.forEach((q, idx) => {
+                    // 找到全局索引
+                    const globalIndex = questions.findIndex(qu => qu.text === q.text);
+                    const checkedScore = scores[globalIndex] || 3;
+                    html += `<div class="item-row" data-qidx="${globalIndex}">`;
+                    html += `<div class="item-text">${q.text}</div>`;
+                    html += `<div class="radio-group">`;
+
+                    for (let val = 1; val <= 5; val++) {
+                        const checkedAttr = (checkedScore === val) ? 'checked' : '';
+                        html += `
+                            <input type="radio" name="q${globalIndex}" id="q${globalIndex}_${val}" value="${val}" ${checkedAttr}>
+                            <label for="q${globalIndex}_${val}">${val}</label>
+                        `;
+                    }
+                    html += `</div></div>`; // close radio-group + item-row
+                });
+                html += `</div>`; // close section
+            }
+            container.innerHTML = html;
+
+            // 绑定事件
+            for (let i = 0; i < questions.length; i++) {
+                const radios = document.getElementsByName(`q${i}`);
+                radios.forEach(radio => {
+                    radio.addEventListener('change', function(e) {
+                        if (this.checked) {
+                            scores[i] = parseInt(this.value);
+                            updateAll();
+                        }
+                    });
+                });
+            }
+        }
+
+        // 计算总分和分段小计
+        function calcTotal() {
+            return scores.reduce((acc, v) => acc + v, 0);
+        }
+
+        // 更新所有显示: 总分、百分比、量表、建议
+        function updateAll() {
+            const total = calcTotal();
+            const percent = (total / 100) * 100; // 满分100, 直接百分比
+            totalSpan.innerText = total;
+            percentSpan.innerText = Math.round(percent) + '%';
+            gaugeFill.style.width = percent + '%';
+
+            // 判定区间
+            let verdict = '';
+            let desc = '';
+            let advices = [];
+
+            if (total >= 90) {
+                verdict = '✨ 非常健康';
+                desc = '这段关系能滋养你，安全且平等。';
+                advices = ['珍惜这段关系，保持真诚的沟通', '定期维护，也可以适当表达感谢', '这是你可以依靠的情感资源'];
+            } else if (total >= 75) {
+                verdict = '🌿 基本健康';
+                desc = '关系总体良好，但有小瑕疵。';
+                advices = ['找出相对低分的维度，尝试温和沟通', '留意是否有些需求未被满足', '可以一起成长，不必追求完美'];
+            } else if (total >= 60) {
+                verdict = '⚠️ 黄灯预警';
+                desc = '消耗已显现，需要设立边界。';
+                advices = ['减少主动付出，观察对方是否愿意调整', '对部分题目低分的项直接表达你的感受', '准备好心理撤退方案'];
+            } else if (total >= 40) {
+                verdict = '🔥 红灯消耗';
+                desc = '严重消耗，你在这段关系里磨损太多。';
+                advices = ['立即减少接触频率，不必解释太多', '经济与责任切割，不再承接对方的人生', '开始情感撤离，联系其他支持系统'];
+            } else {
+                verdict = '⛔ 有毒关系';
+                desc = '极度不健康，必须止损。';
+                advices = ['果断结束或彻底断联', '不必再期待对方改变', '把重心完全放回自己身上，考虑心理咨询'];
+            }
+
+            verdictTitle.innerText = verdict;
+            verdictDesc.innerText = desc;
+            scoreRangeLabel.innerText = total + ' 分';
+
+            // 生成建议列表html
+            let adviceHtml = '';
+            advices.forEach(t => {
+                adviceHtml += `<li>${t}</li>`;
+            });
+            adviceList.innerHTML = adviceHtml;
+
+            // 改变一下颜色微调
+            const gauge = document.getElementById('gaugeFill');
+            if (total < 40) gauge.style.background = 'linear-gradient(90deg, #b02e3f, #7f1d2b)';
+            else if (total < 60) gauge.style.background = 'linear-gradient(90deg, #d38b3a, #b55f1a)';
+            else if (total < 75) gauge.style.background = 'linear-gradient(90deg, #ccb13b, #b58f2a)';
+            else gauge.style.background = 'linear-gradient(90deg, #6688b6, #345e9b)';
+        }
+
+        // 重置所有分数为3
+        function resetScores() {
+            for (let i = 0; i < scores.length; i++) {
+                scores[i] = 3;
+            }
+            // 更新radio checked
+            for (let i = 0; i < questions.length; i++) {
+                const radios = document.getElementsByName(`q${i}`);
+                radios.forEach(radio => {
+                    if (radio.value == 3) {
+                        radio.checked = true;
+                    }
+                });
+            }
+            updateAll();
+        }
+
+        // 监听重置按钮
+        document.getElementById('resetBtn').addEventListener('click', resetScores);
+
+        // 初始渲染
+        renderSections();
+
+        // 从默认checked (页面刚渲染时只有3被默认checked，但score数组已默认3) 同步一下
+        // 但可能用户之前已经修改过？为了安全，把所有radios的checked状态同步到scores
+        function syncScoresFromDom() {
+            for (let i = 0; i < questions.length; i++) {
+                const radios = document.getElementsByName(`q${i}`);
+                for (let r of radios) {
+                    if (r.checked) {
+                        scores[i] = parseInt(r.value);
+                        break;
+                    }
+                }
+            }
+        }
+
+        syncScoresFromDom();
+        updateAll();
+
+        // 可选：当修改名称或日期仅作展示，不影响逻辑
+        document.getElementById('relationName').addEventListener('input', function(){});
+        document.getElementById('assessDate').addEventListener('change', function(){});
+    })();
+</script>
+</body>
+</html>
